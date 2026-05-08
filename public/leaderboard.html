@@ -1,0 +1,24 @@
+<!doctype html>
+<html><body>
+<h1>Лидерборд</h1>
+<p><a href='/home'>← Home</a></p>
+<table border='1' id='t'><thead><tr><th>Место</th><th>Имя</th><th>I</th><th>II</th><th>III</th><th>IV</th><th>V</th><th>Общ.</th></tr></thead><tbody></tbody></table>
+<script type='module'>
+import { db, collection, query, orderBy, getDocs } from './js/firebase-init.js';
+import { requireAuth, getAuthedContext, ensureVerified } from './js/guards.js';
+requireAuth(async (user) => {
+  const ctx = await getAuthedContext(user); if (!ctx) return;
+  if (!ensureVerified(ctx.user, ctx.profile)) return;
+  const q = query(collection(db, 'leaderboardResults'), orderBy('overallAvg', 'desc'));
+  const snap = await getDocs(q);
+  const tbody = document.querySelector('#t tbody');
+  tbody.innerHTML = '';
+  snap.forEach((d, i) => {
+    const v = d.data();
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${i + 1}</td><td>${v.username || '-'}</td><td>${v.mathAvg ?? 0}</td><td>${v.scienceAvg ?? 0}</td><td>${v.humanitiesAvg ?? 0}</td><td>${v.physicalAvg ?? 0}</td><td>${v.appearanceAvg ?? 0}</td><td>${v.overallAvg ?? 0}</td>`;
+    tbody.appendChild(tr);
+  });
+});
+</script>
+</body></html>
