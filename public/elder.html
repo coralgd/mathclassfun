@@ -1,0 +1,14 @@
+<!doctype html>
+<html><body>
+<h1>Elder Panel</h1>
+<p><a href='./home.html'>← Home</a></p>
+<p>Дополнительно к moderator: роли и блокировки устройств (UI-заглушка).</p>
+<script type='module'>
+import { requireAuth, getAuthedContext, ensureVerified, ensureRole } from './js/guards.js';
+requireAuth(async (user) => {
+  const ctx = await getAuthedContext(user); if (!ctx) return;
+  if (!ensureVerified(ctx.user, ctx.profile)) return;
+  ensureRole(ctx.profile, ['elder']);
+});
+</script>
+</body></html>

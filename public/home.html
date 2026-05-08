@@ -1,0 +1,22 @@
+<!doctype html><html><body><h1>Home</h1><p id='stats'></p><button onclick="go('leaderboard')">Лидерборд</button><button onclick="go('voting')">Голосовать</button><button id='check'>Проверить</button><button id='logout'>Выйти</button><p id='msg'></p>
+<script type='module'>
+import { auth, signOut, db, doc, getDoc } from './js/firebase-init.js';
+import { go } from './js/routes.js';
+import { requireAuth, getAuthedContext, ensureVerified } from './js/guards.js';
+requireAuth(async(user)=>{
+  const ctx = await getAuthedContext(user); if (!ctx) return;
+  if(!ensureVerified(ctx.user, ctx.profile,'/verify')) return;
+  const lb=await getDoc(doc(db,'leaderboardResults',user.uid));
+  if(lb.exists()) {
+    const d=lb.data();
+    stats.textContent=`Место: ${d.place||'-'} | Points: ${d.overallAvg||0} (${d.ratingsCount||0})`;
+  }
+  check.onclick=()=>{
+    if(ctx.profile.role==='player') msg.textContent='Ошибка: модерки нет!';
+    else if(ctx.profile.role==='moder') go('moderator');
+    else if(ctx.profile.role==='elder') go('elder');
+  };
+});
+logout.onclick=()=>signOut(auth).then(()=>go('index'));
+</script>
+</body></html>

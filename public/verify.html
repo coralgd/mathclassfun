@@ -1,0 +1,10 @@
+<!doctype html><html><body><h1>Verify</h1><p id='state'></p><button id='resend'>Отправить письмо повторно</button><button id='request'>Подать заявку на верификацию</button><button id='enter'>Войти</button>
+<script type='module'>
+import { auth, db, doc, getDoc, setDoc, serverTimestamp, sendEmailVerification } from './js/firebase-init.js';
+import { go } from './js/routes.js';
+import { requireAuth, getProfile } from './js/guards.js';
+requireAuth(async(user)=>{const p=await getProfile(user.uid); if(p?.blocked) return go('banned'); if(user.emailVerified&&p?.verificationStatus==='verified'){state.textContent='Верификация получена';enter.style.display='inline';} else if(!user.emailVerified){state.textContent='Подтвердите почту';request.style.display='none';enter.style.display='none';} else if(p?.verificationStatus==='none'){state.textContent='Email подтвержден, можно подать заявку';} else if(p?.verificationStatus==='requested'){state.textContent='Заявка подана, обратитесь к модератору';request.style.display='none';} else if(p?.verificationStatus==='rejected'){state.textContent='Верификация отклонена';request.style.display='none';}});
+resend.onclick=()=>auth.currentUser&&sendEmailVerification(auth.currentUser);
+request.onclick=async()=>{const user=auth.currentUser;await setDoc(doc(db,'verificationRequests',user.uid),{uid:user.uid,requestedAt:serverTimestamp(),status:'pending'});await setDoc(doc(db,'users',user.uid),{verificationStatus:'requested'},{merge:true});state.textContent='Заявка подана, обратитесь к модератору';request.style.display='none';};
+enter.onclick=()=>go('home');
+</script></body></html>
