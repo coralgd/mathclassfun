@@ -1,0 +1,11 @@
+<!doctype html><html><body>
+<h1>Вход / Регистрация</h1>
+<input id='email' placeholder='email'><input id='password' type='password' placeholder='password'>
+<button id='login'>Войти</button><button id='register'>Регистрация</button><p id='msg'></p>
+<script type='module'>
+import { auth, db, doc, setDoc, serverTimestamp, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification } from './js/firebase-init.js';
+const msg=document.getElementById('msg');
+login.onclick=async()=>{try{const {user}=await signInWithEmailAndPassword(auth,email.value,password.value);const snap=await import('./js/guards.js').then(m=>m.getProfile(user.uid)); if(snap?.blocked) return location.assign('/banned'); if(!user.emailVerified||snap?.verificationStatus!=='verified') return location.assign('/verify'); location.assign('/home');}catch(e){msg.textContent=e.message;}};
+register.onclick=async()=>{try{const {user}=await createUserWithEmailAndPassword(auth,email.value,password.value);await setDoc(doc(db,'users',user.uid),{email:user.email||'',name:'',role:'player',emailVerified:false,verificationStatus:'none',deviceFingerprint:'',blocked:false,createdAt:serverTimestamp(),lastLogin:serverTimestamp()});await sendEmailVerification(user);location.assign('/verify');}catch(e){msg.textContent=e.message;}};
+</script>
+</body></html>

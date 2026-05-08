@@ -1,0 +1,20 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "votes",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "createdAt", "order": "DESCENDING" },
+        { "fieldPath": "status", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "leaderboardResults",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "overallAvg", "order": "DESCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}
